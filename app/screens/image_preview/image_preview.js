@@ -22,14 +22,18 @@ import {intlShape} from 'react-intl';
 import Permissions from 'react-native-permissions';
 import Gallery from 'react-native-image-gallery';
 
+import {Client4} from 'mattermost-redux/client';
 import EventEmitter from 'mattermost-redux/utils/event_emitter';
+import {memoizeResult} from 'mattermost-redux/utils/helpers';
 
 import FileAttachmentDocument from 'app/components/file_attachment_list/file_attachment_document';
 import FileAttachmentIcon from 'app/components/file_attachment_list/file_attachment_icon';
+import Loading from 'app/components/loading';
 import {DeviceTypes, NavigationTypes, PermissionTypes} from 'app/constants';
-import {getLocalFilePathFromFile, isDocument, isVideo} from 'app/utils/file';
+import {getLocalFilePathFromFile, isDocument, isGif, isVideo} from 'app/utils/file';
 import {emptyFunction} from 'app/utils/general';
 import {calculateDimensions} from 'app/utils/images';
+import ImageCacheManager from 'app/utils/image_cache_manager';
 import {t} from 'app/utils/i18n';
 
 import Downloader from './downloader';
@@ -74,6 +78,7 @@ export default class ImagePreview extends PureComponent {
             index: props.index,
             origin: props.origin,
             showDownloader: false,
+            galleryKey: 'gallery-0',
             target: props.target,
         };
     }
@@ -292,12 +297,15 @@ export default class ImagePreview extends PureComponent {
     };
 
     renderGallery = () => {
+        const {index, galleryKey} = this.state;
+
         return (
             <Gallery
+                key={galleryKey}
                 errorComponent={this.renderOtherItems}
                 imageComponent={this.renderImageComponent}
                 images={this.props.files}
-                initialPage={this.state.index}
+                initialPage={index}
                 onPageSelected={this.handleChangeImage}
                 onSingleTapConfirmed={this.handleTapped}
                 onSwipedVertical={this.handleSwipedVertical}
@@ -359,7 +367,7 @@ export default class ImagePreview extends PureComponent {
         return null;
     };
 
-    renderOtherItems = (index) => {
+    renderOtherItems = memoizeResult((index) => {
         const {files} = this.props;
         const file = files[index];
 
@@ -370,10 +378,24 @@ export default class ImagePreview extends PureComponent {
                 return this.renderVideoPreview(file);
             }
 
+            const isGifImage = isGif(file.data);
+            if (file.data.has_preview_image) {
+                ImageCacheManager.cache(file.data.name, Client4.getFilePreviewUrl(file.data.id), this.updateFileImage);
+                return <Loading/>;
+            } else if (isGifImage) {
+                ImageCacheManager.cache(file.data.name, Client4.getFileUrl(file.data.id), this.updateFileImage);
+                return <Loading/>;
+            }
             return this.renderAttachmentIcon(file.data);
         }
 
         return <View/>;
+    });
+
+    updateFileImage = () => {
+        const {galleryKey} = this.state;
+        const keyIndex = parseInt(galleryKey.split('-')[1], 10);
+        this.setState({galleryKey: `gallery-${keyIndex + 1}`});
     };
 
     renderVideoPreview = (file) => {
