@@ -2527,8 +2527,12 @@
 				CODE_SIGN_ENTITLEMENTS = Mattermost/Mattermost.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+<<<<<<< HEAD
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 169;
+=======
+				CURRENT_PROJECT_VERSION = 170;
+>>>>>>> 2157fe8085b35aa5effae12aa388a4b154f9b12b
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 929GGE8Q4W;
 				ENABLE_BITCODE = NO;
@@ -2580,8 +2584,12 @@
 				CODE_SIGN_ENTITLEMENTS = Mattermost/Mattermost.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+<<<<<<< HEAD
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 169;
+=======
+				CURRENT_PROJECT_VERSION = 170;
+>>>>>>> 2157fe8085b35aa5effae12aa388a4b154f9b12b
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 929GGE8Q4W;
 				ENABLE_BITCODE = NO;
